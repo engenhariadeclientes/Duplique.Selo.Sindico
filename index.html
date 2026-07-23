@@ -233,7 +233,7 @@
   <div class="wrap capa">
     <div class="selo-badge">🏅 Certificação reconhecida por síndicos em todo o Brasil</div>
     <h1>Descubra se você é um <em>Síndico de Alta Performance</em></h1>
-    <p class="lead">Um diagnóstico executivo de 15 competências da gestão condominial. Ao final, você recebe seu Score, seu posicionamento em relação a outros síndicos avaliados, e — se atingir a nota mínima — o Selo Síndico de Alta Performance.</p>
+    <p class="lead">Um diagnóstico executivo de 15 competências da gestão condominial. Ao final, você recebe seu Score, seu posicionamento em relação a outros síndicos avaliados, e, se atingir a nota mínima, o Selo Síndico de Alta Performance.</p>
 
     <div class="selos-confianca">
       <div class="selo-item"><div class="num">15</div><div class="desc">competências avaliadas</div></div>
@@ -353,12 +353,12 @@
       <div class="acoes-finais">
         <button class="btn fantasma" onclick="compartilharWhatsapp()">Compartilhar no WhatsApp</button>
         <button class="btn fantasma" onclick="compartilharLinkedin()">Compartilhar no LinkedIn</button>
-        <button class="btn vermelho" onclick="alert('Certificado em PDF e Selo para download chegam na Fase 2 — já tenho o desenho pronto, é só construir.')">Baixar certificado (em breve)</button>
+        <button class="btn vermelho" onclick="alert('Certificado em PDF e Selo para download chegam na Fase 2. Já tenho o desenho pronto, é só construir.')">Baixar certificado (em breve)</button>
       </div>
 
       <div class="aviso-fase2">
         Fase 1 em uso: avaliação, pontuação e diagnóstico completos e reais.<br/>
-        Fase 2 (a construir): certificado em PDF com QR Code, selo PNG/SVG para redes sociais, e ranking percentual real (com base nos participantes acumulados) — hoje o ranking mostrado é uma estimativa estatística.
+        Fase 2 (a construir): certificado em PDF com QR Code, selo PNG/SVG para redes sociais, e ranking percentual real (com base nos participantes acumulados). Hoje o ranking mostrado é uma estimativa estatística.
       </div>
     </div>
   </div>
@@ -491,7 +491,7 @@ function renderizarPilar() {
   const pilar = PILARES[pilarAtual];
   const total = PILARES.length;
 
-  document.getElementById("progresso-texto").textContent = `Pilar ${pilarAtual + 1} de ${total} — ${pilar.nome}`;
+  document.getElementById("progresso-texto").textContent = `Pilar ${pilarAtual + 1} de ${total}: ${pilar.nome}`;
   const pct = Math.round((pilarAtual / total) * 100);
   document.getElementById("progresso-pct").textContent = pct + "%";
   document.getElementById("progresso-fill").style.width = pct + "%";
@@ -725,15 +725,15 @@ function animarNumero(elId, alvo) {
 function mensagemPersonalizada(nome, score, nivel, piorPilar) {
   const primeiroNome = (nome || "").split(" ")[0] || "Síndico";
   if (score >= 85) {
-    return `<strong>${primeiroNome}</strong>, sua gestão está no nível de excelência — poucos síndicos atingem essa consistência entre os 15 pilares avaliados. Mesmo assim, ainda vale reforçar <strong>${piorPilar}</strong>, sua competência relativamente mais fraca, pra manter o padrão de Alta Performance no longo prazo.`;
+    return `<strong>${primeiroNome}</strong>, sua gestão está no nível de excelência, poucos síndicos atingem essa consistência entre os 15 pilares avaliados. Mesmo assim, ainda vale reforçar <strong>${piorPilar}</strong>, sua competência relativamente mais fraca, pra manter o padrão de Alta Performance no longo prazo.`;
   }
   if (score >= 70) {
-    return `<strong>${primeiroNome}</strong>, sua gestão está avançada e bem estruturada. O que separa você do Selo de Alta Performance é consistência — principalmente em <strong>${piorPilar}</strong>. É provavelmente o ponto de maior retorno se você focar nos próximos meses.`;
+    return `<strong>${primeiroNome}</strong>, sua gestão está avançada e bem estruturada. O que separa você do Selo de Alta Performance é consistência, principalmente em <strong>${piorPilar}</strong>. É provavelmente o ponto de maior retorno se você focar nos próximos meses.`;
   }
   if (score >= 50) {
-    return `<strong>${primeiroNome}</strong>, sua gestão está em desenvolvimento — o que é normal e comum entre síndicos que ainda não profissionalizaram todos os processos. O maior ganho rápido está em <strong>${piorPilar}</strong>: é ali que pequenas mudanças tendem a gerar o salto mais visível no seu próximo diagnóstico.`;
+    return `<strong>${primeiroNome}</strong>, sua gestão está em desenvolvimento, o que é normal e comum entre síndicos que ainda não profissionalizaram todos os processos. O maior ganho rápido está em <strong>${piorPilar}</strong>: é ali que pequenas mudanças tendem a gerar o salto mais visível no seu próximo diagnóstico.`;
   }
-  return `<strong>${primeiroNome}</strong>, esse resultado é o ponto de partida, não o veredito. Toda gestão de alta performance começou de algum lugar. O primeiro passo mais estratégico agora é <strong>${piorPilar}</strong> — resolver isso já muda o formato do seu próximo diagnóstico.`;
+  return `<strong>${primeiroNome}</strong>, esse resultado é o ponto de partida, não o veredito. Toda gestão de alta performance começou de algum lugar. O primeiro passo mais estratégico agora é <strong>${piorPilar}</strong>. Resolver isso já muda o formato do seu próximo diagnóstico.`;
 }
 
 function sugestaoPara(pilarId) {
