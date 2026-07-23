@@ -12,6 +12,7 @@ function doPost(e) {
     dados.perfil || "",
     dados.qtdCondominios || "",
     dados.qtdUnidades || "",
+    dados.tipoCobranca || "",
     dados.score || "",
     dados.nivel || ""
   ]);
