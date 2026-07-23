@@ -38,23 +38,19 @@
 
   /* ===== Topo institucional ===== */
   .topo {
-    background: linear-gradient(135deg, var(--azul-900), var(--azul-800));
-    color: #fff;
-    padding: 18px 0;
-    border-bottom: 3px solid var(--vermelho);
+    background: #ffffff;
+    color: var(--azul-900);
+    padding: 16px 0;
+    border-bottom: 1px solid var(--cinza-300);
   }
   .topo .wrap { display: flex; align-items: center; justify-content: space-between; }
   .selo-topo {
     font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em;
-    border: 1px solid rgba(255,255,255,0.35); border-radius: 999px; padding: 6px 14px; color: #fff;
+    border: 1px solid var(--cinza-300); border-radius: 999px; padding: 6px 14px; color: var(--azul-800);
   }
 
   /* ===== Logo ===== */
-  .logo-duplique { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
-  .logo-duplique svg { display: block; }
-  .logo-texto { display: flex; flex-direction: column; line-height: 1; }
-  .logo-texto .nome { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 19px; color: #fff; letter-spacing: 0.01em; }
-  .logo-texto .sub { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 9px; color: var(--logo-vermelho); letter-spacing: 0.22em; margin-top: 2px; }
+  .logo-duplique img { display: block; height: 40px; width: auto; }
 
   /* ===== Telas ===== */
   .tela { display: none; padding: 56px 0 90px; }
@@ -226,17 +222,7 @@
 <div class="topo">
   <div class="wrap">
     <div class="logo-duplique">
-      <svg width="46" height="46" viewBox="0 0 46 46" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0" y="0" width="46" height="46" rx="10" fill="#123a5e"/>
-        <path d="M23 9 L34 20 L30.5 20 L30.5 20.3 L23 13 L15.5 20.3 L15.5 20 L12 20 Z" fill="#9c2b21"/>
-        <path d="M15.5 20 C15.5 27 19 30.5 23 30.5 C27 30.5 30.5 27 30.5 20"
-              stroke="#ffffff" stroke-width="3.2" fill="none" stroke-linecap="round"/>
-        <rect x="20.7" y="24.5" width="4.6" height="6.5" rx="0.6" fill="#9c2b21"/>
-      </svg>
-      <div class="logo-texto">
-        <span class="nome">DUPLIQUE</span>
-        <span class="sub">SANTA CATARINA</span>
-      </div>
+      <img src="logo.png" alt="Duplique Santa Catarina" />
     </div>
     <div class="selo-topo">Avaliação Executiva</div>
   </div>
