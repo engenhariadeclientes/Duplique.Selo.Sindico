@@ -209,6 +209,8 @@
 
   .acoes-finais { display: flex; gap: 12px; margin-top: 34px; flex-wrap: wrap; }
   .acoes-finais .btn { flex: 1; min-width: 180px; }
+  .acoes-secundarias { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .acoes-secundarias .btn { flex: 1; min-width: 110px; }
 
   .aviso-fase2 {
     margin-top: 40px; text-align: center; font-size: 12.5px; color: var(--cinza-600);
@@ -310,6 +312,14 @@
         <div class="campo"><label>Unidades no total</label><input type="number" id="l-qtd-unidades" min="1" placeholder="Ex: 120" required /></div>
       </div>
 
+      <div class="campo">
+        <label>Você já é cliente da Duplique Santa Catarina?</label>
+        <div class="perfil-opcoes">
+          <label><input type="radio" name="ja-cliente" value="Sim" />Sim</label>
+          <label><input type="radio" name="ja-cliente" value="Não" checked />Não</label>
+        </div>
+      </div>
+
       <button class="btn vermelho" style="width:100%; margin-top: 8px;" onclick="enviarLeadEVerResultado()" id="btn-ver-resultado">Ver meu resultado →</button>
       <div id="erro-lead"></div>
       <p class="lgpd">Seus dados são usados apenas para gerar seu diagnóstico e enviar seu certificado. Não compartilhamos com terceiros.</p>
@@ -360,10 +370,15 @@
       </div>
 
       <div class="acoes-finais">
-        <button class="btn vermelho" id="btn-baixar-certificado" onclick="baixarCertificado()">Baixar meu certificado →</button>
+        <button class="btn vermelho" id="btn-compartilhar-certificado" onclick="compartilharCertificado()">Compartilhar meu certificado →</button>
+      </div>
+      <div class="acoes-secundarias">
+        <button class="btn fantasma pequeno" onclick="compartilharWhatsapp()">WhatsApp</button>
+        <button class="btn fantasma pequeno" onclick="compartilharLinkedin()">LinkedIn</button>
+        <button class="btn fantasma pequeno" id="btn-baixar-certificado" onclick="baixarCertificado()">Baixar imagem</button>
       </div>
       <p style="text-align:center; font-size: 12.5px; color: var(--cinza-600); margin-top: 12px;">
-        Baixe a imagem e compartilhe no Instagram, WhatsApp ou onde preferir.
+        No celular, "Compartilhar" abre direto o menu do WhatsApp, Instagram e outros apps já com a imagem do certificado.
       </p>
 
       <div class="aviso-fase2">
@@ -650,6 +665,7 @@ async function enviarLeadEVerResultado() {
   const perfil = document.querySelector('input[name="perfil"]:checked').value;
   const qtdCondominios = document.getElementById("l-qtd-condominios").value;
   const qtdUnidades = document.getElementById("l-qtd-unidades").value;
+  const jaCliente = document.querySelector('input[name="ja-cliente"]:checked').value;
 
   const erroEl = document.getElementById("erro-lead");
   erroEl.style.display = "none";
@@ -660,7 +676,7 @@ async function enviarLeadEVerResultado() {
     return;
   }
 
-  leadData = { nome, email, telefone, cidade, estado, perfil, qtdCondominios, qtdUnidades };
+  leadData = { nome, email, telefone, cidade, estado, perfil, qtdCondominios, qtdUnidades, jaCliente };
 
   const btn = document.getElementById("btn-ver-resultado");
   btn.disabled = true;
@@ -738,13 +754,13 @@ function mostrarResultado() {
   document.getElementById("lista-oport").innerHTML = oportunidades
     .map((p) => `<li>${p.nome} <span class="v">${Math.round(p.score)}</span></li>`).join("");
 
-  document.getElementById("mensagem-personalizada").innerHTML = mensagemPersonalizada(leadData.nome, scoreGeral, classe.nivel, oportunidades[0].nome);
+  document.getElementById("mensagem-personalizada").innerHTML = mensagemPersonalizada(leadData.nome, scoreGeral, classe.nivel, oportunidades[0].nome, leadData.jaCliente, extras["tipo-cobranca"]);
 
   document.getElementById("plano-lista").innerHTML = oportunidades
     .map((p, i) => `
       <div class="plano-item">
         <div class="plano-num">${i + 1}</div>
-        <p><strong>${p.nome}:</strong> ${sugestaoPara(p.id)}</p>
+        <p><strong>${p.nome}:</strong> ${sugestaoPara(p.id, extras["tipo-cobranca"])}</p>
       </div>
     `).join("");
 }
@@ -760,24 +776,44 @@ function animarNumero(elId, alvo) {
   }, 20);
 }
 
-function mensagemPersonalizada(nome, score, nivel, piorPilar) {
+function mensagemPersonalizada(nome, score, nivel, piorPilar, jaCliente, tipoCobranca) {
   const primeiroNome = (nome || "").split(" ")[0] || "Síndico";
+  const partes = [];
+
+  if (jaCliente === "Sim") {
+    partes.push(`Só o fato de já ser cliente Duplique Santa Catarina já é um avanço: isso coloca <strong>${primeiroNome}</strong> à frente de muitos outros síndicos nesse quesito.`);
+  }
+
   if (score >= 85) {
-    return `<strong>${primeiroNome}</strong>, sua gestão está no nível de excelência, poucos síndicos atingem essa consistência entre os 15 pilares avaliados. Mesmo assim, ainda vale reforçar <strong>${piorPilar}</strong>, sua competência relativamente mais fraca, pra manter o padrão de Alta Performance no longo prazo.`;
+    partes.push(`<strong>${primeiroNome}</strong>, sua gestão está no nível de excelência, poucos síndicos atingem essa consistência entre os 15 pilares avaliados. Mesmo assim, ainda vale reforçar <strong>${piorPilar}</strong>, sua competência relativamente mais fraca, pra manter o padrão de Alta Performance no longo prazo.`);
+  } else if (score >= 70) {
+    partes.push(`<strong>${primeiroNome}</strong>, sua gestão está avançada e bem estruturada. O que separa você do Selo de Alta Performance é consistência, principalmente em <strong>${piorPilar}</strong>. É provavelmente o ponto de maior retorno se você focar nos próximos meses.`);
+  } else if (score >= 50) {
+    partes.push(`<strong>${primeiroNome}</strong>, sua gestão está em desenvolvimento, o que é normal e comum entre síndicos que ainda não profissionalizaram todos os processos. O maior ganho rápido está em <strong>${piorPilar}</strong>: é ali que pequenas mudanças tendem a gerar o salto mais visível no seu próximo diagnóstico.`);
+  } else {
+    partes.push(`<strong>${primeiroNome}</strong>, esse resultado é o ponto de partida, não o veredito. Toda gestão de alta performance começou de algum lugar. O primeiro passo mais estratégico agora é <strong>${piorPilar}</strong>. Resolver isso já muda o formato do seu próximo diagnóstico.`);
   }
-  if (score >= 70) {
-    return `<strong>${primeiroNome}</strong>, sua gestão está avançada e bem estruturada. O que separa você do Selo de Alta Performance é consistência, principalmente em <strong>${piorPilar}</strong>. É provavelmente o ponto de maior retorno se você focar nos próximos meses.`;
+
+  if (tipoCobranca === "Garantia de receita") {
+    partes.push(`Sobre a garantia de receita: ela pode ser um fator positivo e um apoio real pro fluxo de caixa do condomínio, mas fique atento: garanta que o fornecedor contratado seja confiável, transparente e tenha histórico sólido no mercado, pra não trocar o problema da inadimplência por um problema de confiabilidade do parceiro.`);
   }
-  if (score >= 50) {
-    return `<strong>${primeiroNome}</strong>, sua gestão está em desenvolvimento, o que é normal e comum entre síndicos que ainda não profissionalizaram todos os processos. O maior ganho rápido está em <strong>${piorPilar}</strong>: é ali que pequenas mudanças tendem a gerar o salto mais visível no seu próximo diagnóstico.`;
-  }
-  return `<strong>${primeiroNome}</strong>, esse resultado é o ponto de partida, não o veredito. Toda gestão de alta performance começou de algum lugar. O primeiro passo mais estratégico agora é <strong>${piorPilar}</strong>. Resolver isso já muda o formato do seu próximo diagnóstico.`;
+
+  return partes.join(" ");
 }
 
-function sugestaoPara(pilarId) {
+function sugestaoPara(pilarId, tipoCobranca) {
+  if (pilarId === "inadimplencia") {
+    if (tipoCobranca === "Garantia de receita") {
+      return "acompanhe periodicamente a confiabilidade e a transparência do fornecedor de garantia de receita: peça relatórios claros e mantenha um canal de acompanhamento próximo mesmo com a garantia ativa.";
+    }
+    if (tipoCobranca === "Escritório de cobrança terceirizado") {
+      return "acompanhe de perto os indicadores do escritório terceirizado (prazo médio de recuperação, taxa de sucesso) e renegocie o contrato se os números não melhorarem.";
+    }
+    return "estruture um funil de cobrança com 3 etapas (lembrete amigável, notificação formal, negativação) com prazos fixos.";
+  }
+
   const sugestoes = {
     "financeira": "implemente um relatório financeiro mensal simples, compartilhado com os moradores em até 5 dias após o fechamento do mês.",
-    "inadimplencia": "estruture um funil de cobrança com 3 etapas (lembrete amigável, notificação formal, negativação) com prazos fixos.",
     "planejamento-financeiro": "monte o orçamento do próximo exercício com pelo menos 60 dias de antecedência da assembleia de aprovação.",
     "lideranca": "delegue formalmente responsabilidades específicas para o conselho, com reuniões mensais de acompanhamento.",
     "assembleias": "envie a pauta com pelo menos 7 dias de antecedência e limite cada assembleia a no máximo 3 temas centrais.",
@@ -858,7 +894,7 @@ function desenharRadar(porPilar) {
   document.getElementById("radar-wrap").innerHTML = svg;
 }
 
-/* ===================== CERTIFICADO PARA DOWNLOAD ===================== */
+/* ===================== CERTIFICADO (GERAÇÃO + DOWNLOAD + COMPARTILHAMENTO) ===================== */
 function carregarImagem(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -869,97 +905,151 @@ function carregarImagem(src) {
   });
 }
 
+function nomeArquivoCertificado() {
+  return `certificado-selo-sindico-${(leadData.nome || "sindico").replace(/\s+/g, "-").toLowerCase()}.png`;
+}
+
+async function gerarCertificadoBlob() {
+  const logo = await carregarImagem("logo.png");
+
+  const largura = 1200, altura = 850;
+  const canvas = document.createElement("canvas");
+  canvas.width = largura;
+  canvas.height = altura;
+  const ctx = canvas.getContext("2d");
+
+  // Fundo
+  const gradiente = ctx.createLinearGradient(0, 0, largura, altura);
+  gradiente.addColorStop(0, "#0d2f4f");
+  gradiente.addColorStop(1, "#123a5e");
+  ctx.fillStyle = gradiente;
+  ctx.fillRect(0, 0, largura, altura);
+
+  // Cartão interno branco
+  const margem = 40;
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(margem, margem, largura - margem * 2, altura - margem * 2);
+  ctx.strokeStyle = "#3f8fd1";
+  ctx.lineWidth = 3;
+  ctx.strokeRect(margem + 14, margem + 14, largura - (margem + 14) * 2, altura - (margem + 14) * 2);
+
+  // Logo
+  const logoAltura = 70;
+  const logoLargura = logoAltura * (logo.width / logo.height);
+  ctx.drawImage(logo, largura / 2 - logoLargura / 2, 90, logoLargura, logoAltura);
+
+  ctx.textAlign = "center";
+
+  ctx.fillStyle = "#64707d";
+  ctx.font = "600 20px Inter, sans-serif";
+  ctx.fillText("CERTIFICADO DE RECONHECIMENTO", largura / 2, 225);
+
+  ctx.fillStyle = "#0d2f4f";
+  ctx.font = "800 46px Montserrat, sans-serif";
+  ctx.fillText("Síndico de Alta Performance", largura / 2, 285);
+
+  ctx.fillStyle = "#64707d";
+  ctx.font = "400 18px Inter, sans-serif";
+  ctx.fillText("Este certificado reconhece que", largura / 2, 350);
+
+  const nome = leadData.nome || "Síndico(a)";
+  ctx.fillStyle = "#0d2f4f";
+  ctx.font = "800 40px Montserrat, sans-serif";
+  ctx.fillText(nome, largura / 2, 405);
+
+  const classe = classificar(resultadoFinal.scoreGeral);
+  ctx.fillStyle = "#64707d";
+  ctx.font = "400 18px Inter, sans-serif";
+  ctx.fillText("obteve, no diagnóstico executivo de gestão condominial Duplique, a pontuação de", largura / 2, 450);
+
+  ctx.fillStyle = "#0d2f4f";
+  ctx.font = "800 90px Montserrat, sans-serif";
+  ctx.fillText(`${resultadoFinal.scoreGeral}/100`, largura / 2, 550);
+
+  ctx.fillStyle = "#3f8fd1";
+  ctx.font = "800 24px Montserrat, sans-serif";
+  ctx.fillText(classe.nivel.toUpperCase(), largura / 2, 590);
+
+  const dataFormatada = new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
+  ctx.fillStyle = "#64707d";
+  ctx.font = "400 16px Inter, sans-serif";
+  ctx.fillText(dataFormatada, largura / 2, altura - 90);
+
+  ctx.font = "600 14px Inter, sans-serif";
+  ctx.fillText("DUPLIQUE SANTA CATARINA", largura / 2, altura - 60);
+
+  return new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+}
+
 async function baixarCertificado() {
   const btn = document.getElementById("btn-baixar-certificado");
+  const textoOriginal = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Gerando...";
+
+  try {
+    const blob = await gerarCertificadoBlob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = nomeArquivoCertificado();
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error("Não foi possível gerar o certificado:", err);
+    alert("Não foi possível gerar o certificado agora. Tenta novamente em alguns segundos.");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = textoOriginal;
+  }
+}
+
+async function compartilharCertificado() {
+  const btn = document.getElementById("btn-compartilhar-certificado");
   const textoOriginal = btn.textContent;
   btn.disabled = true;
   btn.textContent = "Gerando certificado...";
 
   try {
-    const logo = await carregarImagem("logo.png");
+    const blob = await gerarCertificadoBlob();
+    const arquivo = new File([blob], nomeArquivoCertificado(), { type: "image/png" });
+    const dadosCompartilhamento = {
+      files: [arquivo],
+      title: "Selo Síndico de Alta Performance",
+      text: `Tirei ${resultadoFinal.scoreGeral}/100 no diagnóstico de gestão condominial da Duplique Santa Catarina!`,
+    };
 
-    const largura = 1200, altura = 850;
-    const canvas = document.createElement("canvas");
-    canvas.width = largura;
-    canvas.height = altura;
-    const ctx = canvas.getContext("2d");
-
-    // Fundo
-    const gradiente = ctx.createLinearGradient(0, 0, largura, altura);
-    gradiente.addColorStop(0, "#0d2f4f");
-    gradiente.addColorStop(1, "#123a5e");
-    ctx.fillStyle = gradiente;
-    ctx.fillRect(0, 0, largura, altura);
-
-    // Cartão interno branco
-    const margem = 40;
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(margem, margem, largura - margem * 2, altura - margem * 2);
-    ctx.strokeStyle = "#3f8fd1";
-    ctx.lineWidth = 3;
-    ctx.strokeRect(margem + 14, margem + 14, largura - (margem + 14) * 2, altura - (margem + 14) * 2);
-
-    // Logo
-    const logoAltura = 70;
-    const logoLargura = logoAltura * (logo.width / logo.height);
-    ctx.drawImage(logo, largura / 2 - logoLargura / 2, 90, logoLargura, logoAltura);
-
-    ctx.textAlign = "center";
-
-    ctx.fillStyle = "#64707d";
-    ctx.font = "600 20px Inter, sans-serif";
-    ctx.fillText("CERTIFICADO DE RECONHECIMENTO", largura / 2, 225);
-
-    ctx.fillStyle = "#0d2f4f";
-    ctx.font = "800 46px Montserrat, sans-serif";
-    ctx.fillText("Síndico de Alta Performance", largura / 2, 285);
-
-    ctx.fillStyle = "#64707d";
-    ctx.font = "400 18px Inter, sans-serif";
-    ctx.fillText("Este certificado reconhece que", largura / 2, 350);
-
-    const nome = leadData.nome || "Síndico(a)";
-    ctx.fillStyle = "#0d2f4f";
-    ctx.font = "800 40px Montserrat, sans-serif";
-    ctx.fillText(nome, largura / 2, 405);
-
-    const classe = classificar(resultadoFinal.scoreGeral);
-    ctx.fillStyle = "#64707d";
-    ctx.font = "400 18px Inter, sans-serif";
-    ctx.fillText("obteve, no diagnóstico executivo de gestão condominial Duplique, a pontuação de", largura / 2, 450);
-
-    ctx.fillStyle = "#0d2f4f";
-    ctx.font = "800 90px Montserrat, sans-serif";
-    ctx.fillText(`${resultadoFinal.scoreGeral}/100`, largura / 2, 550);
-
-    ctx.fillStyle = "#3f8fd1";
-    ctx.font = "800 24px Montserrat, sans-serif";
-    ctx.fillText(classe.nivel.toUpperCase(), largura / 2, 590);
-
-    const dataFormatada = new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
-    ctx.fillStyle = "#64707d";
-    ctx.font = "400 16px Inter, sans-serif";
-    ctx.fillText(dataFormatada, largura / 2, altura - 90);
-
-    ctx.font = "600 14px Inter, sans-serif";
-    ctx.fillText("DUPLIQUE SANTA CATARINA", largura / 2, altura - 60);
-
-    canvas.toBlob((blob) => {
+    if (navigator.canShare && navigator.canShare(dadosCompartilhamento)) {
+      await navigator.share(dadosCompartilhamento);
+    } else {
+      // Navegador não suporta compartilhar arquivo (comum em desktop): baixa e orienta.
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `certificado-selo-sindico-${(leadData.nome || "sindico").replace(/\s+/g, "-").toLowerCase()}.png`;
+      a.download = nomeArquivoCertificado();
       a.click();
       URL.revokeObjectURL(url);
-      btn.disabled = false;
-      btn.textContent = textoOriginal;
-    }, "image/png");
+      alert("Seu navegador não permite compartilhar a imagem direto. Baixamos o certificado, é só anexar no WhatsApp, Instagram ou onde preferir.");
+    }
   } catch (err) {
-    console.error("Não foi possível gerar o certificado:", err);
+    if (err.name !== "AbortError") {
+      console.error("Não foi possível compartilhar o certificado:", err);
+      alert("Não foi possível compartilhar agora. Tenta novamente em alguns segundos.");
+    }
+  } finally {
     btn.disabled = false;
     btn.textContent = textoOriginal;
-    alert("Não foi possível gerar o certificado agora. Tenta novamente em alguns segundos.");
   }
+}
+
+function compartilharWhatsapp() {
+  const texto = encodeURIComponent(`Tirei ${resultadoFinal.scoreGeral}/100 no diagnóstico de gestão condominial da Duplique Santa Catarina! Faça o seu também:`);
+  window.open(`https://wa.me/?text=${texto}`, "_blank");
+}
+
+function compartilharLinkedin() {
+  const url = encodeURIComponent(window.location.href);
+  window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, "_blank");
 }
 </script>
 </body>
