@@ -664,6 +664,21 @@ async function enviarLeadEVerResultado() {
     console.error("Não foi possível enviar o lead pro pipeline (não bloqueia o resultado):", err);
   }
 
+  // Envia o lead + resultado pra planilha (via nosso servidor, que repassa pro Apps Script).
+  try {
+    await fetch("/submit-lead", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...leadData,
+        score: resultadoFinal.scoreGeral,
+        nivel: classificar(resultadoFinal.scoreGeral).nivel,
+      }),
+    });
+  } catch (err) {
+    console.error("Não foi possível salvar o lead na planilha (não bloqueia o resultado):", err);
+  }
+
   setTimeout(() => mostrarResultado(), 1400); // pequena pausa proposital — reforça a sensação de "processamento sério"
 }
 
