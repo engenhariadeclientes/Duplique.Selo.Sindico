@@ -247,7 +247,7 @@
     <div class="selos-confianca">
       <div class="selo-item"><div class="num">15</div><div class="desc">competências avaliadas</div></div>
       <div class="selo-item"><div class="num">~8min</div><div class="desc">tempo médio de resposta</div></div>
-      <div class="selo-item"><div class="num">75+</div><div class="desc">pontos para o Selo</div></div>
+      <div class="selo-item"><div class="num">85+</div><div class="desc">pontos para o Selo</div></div>
     </div>
 
     <button class="btn vermelho" onclick="iniciarAvaliacao()">Iniciar minha avaliação →</button>
@@ -714,7 +714,7 @@ function mostrarResultado() {
   const { porPilar, scoreGeral } = resultadoFinal;
   const classe = classificar(scoreGeral);
   const percentil = estimarPercentil(scoreGeral);
-  const selo = scoreGeral >= 75;
+  const selo = scoreGeral >= 85;
 
   mostrarTela("tela-resultado");
 
